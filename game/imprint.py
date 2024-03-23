@@ -4,7 +4,6 @@ from pygame.math import Vector2
 import random
 
 
-
 class DUCK:
     def __init__(self, paused):
         self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
@@ -133,10 +132,19 @@ class MAIN:
     def pause_game(self):
         self.paused = not self.paused
         self.duck.pause()
+    
 
+"""def game_paused_display():
+    game_paused = font.render("Game Paused\n X, B, Y, A for UP, DOWN, LEFT, RIGHT", True, (255, 255, 255))
+    screen.blit(game_paused, (160, 260))"""
 
 # Initializes pygame
 pygame.init()
+
+# Initalizes the joystick module
+pygame.joystick.init()
+
+# Sets up screen and clock
 cell_size = 35
 cell_number = 15
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
@@ -151,6 +159,7 @@ icon = pygame.image.load("./game/assets/duck_icon.png")
 pygame.display.set_icon(icon)
 
 # Score
+global score_value
 score_value = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
 textX = 2
@@ -174,10 +183,46 @@ while running:
             running = False
             sys.exit()
 
+        # detects if a controller is pluged in
+        if event.type == pygame.JOYDEVICEADDED:
+            print("Controller connected: " + str(event))
+            joy = pygame.joystick.Joystick(event.device_index)
+            print(str(joy.get_name()))
+            
+        # movement with controller buttons
+        if event.type == pygame.JOYBUTTONDOWN:
+            # X button
+            if event.button == 0 and main_game.duck.direction.y != 1:
+                if main_game.paused:
+                    main_game.paused = False
+                main_game.duck.direction = Vector2(0, -1)
+            # A button
+            if event.button == 1 and main_game.duck.direction.x != -1:
+                if main_game.paused:
+                    main_game.paused = False
+                main_game.duck.direction = Vector2(1, 0)
+            # B button
+            if event.button == 2 and main_game.duck.direction.y != -1:
+                if main_game.paused:
+                    main_game.paused = False
+                main_game.duck.direction = Vector2(0, 1)
+            # Y button
+            if event.button == 3 and main_game.duck.direction.x != 1:
+                if main_game.paused:
+                    main_game.paused = False
+                main_game.duck.direction = Vector2(-1, 0)
+            # start button
+            if event.button == 9:
+                main_game.pause_game()
+            # select button
+            if event.button == 8:
+                running = False
+    
         # For any event calls update
         if event.type == SCREEN_UPDATE:
             main_game.update()
 
+        # keyboard controls
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and main_game.duck.direction.y != 1:
                 if main_game.paused:
@@ -201,5 +246,5 @@ while running:
                 running = False
 
     pygame.display.update()
-    # Framerate
+    # Framerate 60 fps
     clock.tick(60)
