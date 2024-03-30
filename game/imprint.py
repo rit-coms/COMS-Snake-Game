@@ -2,6 +2,7 @@ import pygame
 import sys
 from pygame.math import Vector2
 import random
+import json
 
 
 class DUCK:
@@ -40,6 +41,7 @@ class DUCK:
         self.body = [Vector2(5,10), Vector2(4,10), Vector2(3,10)]
         self.direction = Vector2(0, 0)
         global score_value 
+        update_high_score(score_value)
         score_value = 0
 
     """Returns the status for pausing the duck"""
@@ -60,15 +62,15 @@ class BREAD:
     """Randomizes the position of the bread"""
     def randomize(self, duck_body):
         while True:
-            self.x = random.randint(0, cell_number - 1)
-            self.y = random.randint(0, cell_number - 1)
+            self.x = random.randint(2, cell_number - 1)
+            self.y = random.randint(2, cell_number - 1)
             self.pos = Vector2(self.x, self.y)
             if self.pos not in duck_body:
                 break
 
 class MAIN:
     def __init__(self):
-        self.paused = False
+        self.paused = True
         self.duck = DUCK(self.paused)
         self.bread = BREAD(self.duck.body)
         
@@ -78,7 +80,7 @@ class MAIN:
             self.duck.move_duck()
             self.check_collision()
             self.check_fail()
-        self.display_score(textX, textY)
+        self.display_score()
 
     """Draws the two elements necessary for the game"""
     def draw_elements(self):
@@ -96,7 +98,7 @@ class MAIN:
     """Checks if the duck trail hit itslef or hit the boarder
     ends the game if either of the conditions are true"""
     def check_fail(self):
-        if not 0 <= self.duck.body[0].x < cell_number or not 0 <= self.duck.body[0].y < cell_number:
+        if not 2 <= self.duck.body[0].x < cell_number or not 2 <= self.duck.body[0].y < cell_number:
             self.game_over()
 
         for block in self.duck.body[1:]:
@@ -105,25 +107,26 @@ class MAIN:
 
     """Resets the game when it's over"""
     def game_over(self):
+        self.pause_game()
         self.duck.reset()
 
     """Draws the score onto the screen"""
-    def display_score(self, x:int, y:int):
+    def display_score(self):
         score = font.render("Score : " + str(score_value), True, (255, 255, 255))
-        screen.blit(score, (x, y))
+        screen.blit(score, (2, 2))
 
     """Displays a grass pattern 
     Changes color of the "grass" depending on if the column is even or odd"""
     def grass_pattern(self):
         grass_color = (160, 220, 80)
-        for row in range(cell_number):
+        for row in range(2, cell_number):
             if row % 2 == 0:
-                for col in range(cell_number):
+                for col in range(2, cell_number):
                     if col % 2 == 0:
                         grass_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
                         pygame.draw.rect(screen, grass_color, grass_rect)
             else:
-                for col in range(cell_number):
+                for col in range(2, cell_number):
                     if col % 2 != 0:
                         grass_rect = pygame.Rect(col * cell_size, row * cell_size, cell_size, cell_size)
                         pygame.draw.rect(screen, grass_color, grass_rect)
@@ -132,11 +135,35 @@ class MAIN:
     def pause_game(self):
         self.paused = not self.paused
         self.duck.pause()
-    
 
-"""def game_paused_display():
-    game_paused = font.render("Game Paused\n X, B, Y, A for UP, DOWN, LEFT, RIGHT", True, (255, 255, 255))
-    screen.blit(game_paused, (160, 260))"""
+    """Draws the game paused screen"""
+    def game_paused_display(self):
+        game_paused = font.render("Game Paused" , True, 'white')
+        move_text = font.render("Move to Continue", True, 'white')
+        screen.blit(game_paused, (190, 230))
+        screen.blit(move_text, (160, 280))
+
+    """Draws the high score"""
+    def high_score_display(self):
+        high_score_value = get_high_score()
+        high_score = font.render("High Score: " + str(high_score_value), True, 'white')
+        screen.blit(high_score, (360, 2))
+
+
+"""Updates the high score if the current score exceeds it"""
+def update_high_score(score):
+    high_score = get_high_score()
+    if score > high_score:
+        high_score_dict = {"high_score": score}
+        json_object = json.dumps(high_score_dict, indent=4)
+        with open("highscore.json", "w") as outfile:
+            outfile.write(json_object)
+
+"""Retrieves the current high score"""
+def get_high_score():
+    with open("highscore.json", "r") as openfile:
+        json_object = json.load(openfile)
+    return json_object["high_score"]
 
 # Initializes pygame
 pygame.init()
@@ -145,10 +172,15 @@ pygame.init()
 pygame.joystick.init()
 
 # Sets up screen and clock
+"""Created the screen_cell_number to have the score and high score displayed outside the playable area. 
+    All gameplay elements are done within the playable are"""
+screen_cell_number = 17
 cell_size = 35
 cell_number = 15
-screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
+screen = pygame.display.set_mode((screen_cell_number * cell_size, screen_cell_number * cell_size))
 clock = pygame.time.Clock()
+
+# Assets
 bread = pygame.image.load("./game/assets/bread.png")
 mom_duck = pygame.image.load("./game/assets/duck_player.png")
 baby_duck = pygame.image.load("./game/assets/rubber-duck.png") 
@@ -162,8 +194,6 @@ pygame.display.set_icon(icon)
 global score_value
 score_value = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
-textX = 2
-textY = 2
 
 main_game = MAIN()
 
@@ -176,7 +206,12 @@ while running:
     screen.fill((126, 189, 64))
     main_game.grass_pattern()
     main_game.draw_elements()
-    main_game.display_score(textX, textY)
+    main_game.display_score()
+    main_game.high_score_display()
+
+    if main_game.paused:
+        main_game.game_paused_display()
+
     for event in pygame.event.get():
         # exits the game
         if event.type == pygame.QUIT:
@@ -244,6 +279,7 @@ while running:
                 main_game.pause_game()
             if event.key == pygame.K_ESCAPE:
                 running = False
+        
 
     pygame.display.update()
     # Framerate 60 fps
