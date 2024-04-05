@@ -140,14 +140,14 @@ class MAIN:
     def game_paused_display(self):
         game_paused = font.render("Game Paused" , True, 'white')
         move_text = font.render("Move to Continue", True, 'white')
-        screen.blit(game_paused, (190, 230))
-        screen.blit(move_text, (160, 280))
+        screen.blit(game_paused, (275, 310))
+        screen.blit(move_text, (245, 360))
 
     """Draws the high score"""
     def high_score_display(self):
         high_score_value = get_high_score()
         high_score = font.render("High Score: " + str(high_score_value), True, 'white')
-        screen.blit(high_score, (360, 2))
+        screen.blit(high_score, (525, 2))
 
 
 """Updates the high score if the current score exceeds it"""
@@ -174,9 +174,9 @@ pygame.joystick.init()
 # Sets up screen and clock
 """Created the screen_cell_number to have the score and high score displayed outside the playable area. 
     All gameplay elements are done within the playable are"""
-screen_cell_number = 17
+screen_cell_number = 22
 cell_size = 35
-cell_number = 15
+cell_number = 20
 screen = pygame.display.set_mode((screen_cell_number * cell_size, screen_cell_number * cell_size))
 clock = pygame.time.Clock()
 
