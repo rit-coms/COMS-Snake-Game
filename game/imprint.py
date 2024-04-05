@@ -147,7 +147,7 @@ class MAIN:
     def high_score_display(self):
         high_score_value = get_high_score()
         high_score = font.render("High Score: " + str(high_score_value), True, 'white')
-        screen.blit(high_score, (525, 2))
+        screen.blit(high_score, (520, 2))
 
 
 """Updates the high score if the current score exceeds it"""
