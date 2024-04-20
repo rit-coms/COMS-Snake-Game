@@ -182,13 +182,13 @@ screen = pygame.display.set_mode((screen_cell_number * cell_size, screen_cell_nu
 clock = pygame.time.Clock()
 
 # Assets
-bread = pygame.image.load("./game/assets/bread_3.png")
-mom_duck = pygame.image.load("./game/assets/mama_duck_evil.png")
-baby_duck = pygame.image.load("./game/assets/meow.png") 
+bread = pygame.image.load("assets/bread_3.png")
+mom_duck = pygame.image.load("assets/mama_duck_evil.png")
+baby_duck = pygame.image.load("assets/meow.png") 
 
 # Title and Icon
 pygame.display.set_caption("Imprint")
-icon = pygame.image.load("./game/assets/duck_icon.png")
+icon = pygame.image.load("assets/duck_icon.png")
 pygame.display.set_icon(icon)
 
 # Score
