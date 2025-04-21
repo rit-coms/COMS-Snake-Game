@@ -1,0 +1,16 @@
+{
+    "title": "Imprint",
+    "author": "Christopher West",
+    "summary": "Imprint, the duck inspired snake game for the COMS console\nOn PC use the arrow keys to move\nSNES Controls: X-Up A-Right Y-Left B-Down\nShoutout to Zoe for the assets",
+    "release_date": "2024-4-20",
+    "multiplayer": false,
+    "genres": [
+        "Strategy",
+        "Survival"
+    ],
+    "times_played": 0,
+    "last_played": 1000000,
+    "cover_image": "./Imprint.jpg",
+    "exec": "game.sh"
+
+}
