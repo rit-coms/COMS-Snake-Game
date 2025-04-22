@@ -4,8 +4,7 @@ from pygame.math import Vector2
 import random
 import json
 import asyncio
-import quackbox
-import quackbox.leaderboard
+from quackbox import leaderboard
 
 
 class DUCK:
@@ -155,22 +154,31 @@ class MAIN:
 
 """Updates the high score if the current score exceeds it"""
 def update_high_score(score):
-    # high_score = get_high_score()
-    quackbox.leaderboard.add_leaderboard_entry("score", score, 1)
-    # if score > high_score:
-    #     high_score_dict = {"high_score": score}
-    #     json_object = json.dumps(high_score_dict, indent=4)
-    #     with open("highscore.json", "w") as outfile:
-    #         outfile.write(json_object)
+    high_score = get_high_score()
+    try:
+        leaderboard.add_leaderboard_entry("score", score, 1)
+    except Exception as e:
+        print(e)
+        if score > high_score:
+            high_score_dict = {"high_score": score}
+            json_object = json.dumps(high_score_dict, indent=4)
+            with open("highscore.json", "w") as outfile:
+                outfile.write(json_object)
 
 """Retrieves the current high score"""
 def get_high_score():
-    return quackbox.leaderboard.get_user_lb_entries("score", 1, 1)
-    
-    # Old leaderboard code
-    # with open("highscore.json", "r") as openfile:
-    #     json_object = json.load(openfile)
-    # return json_object["high_score"]
+    try:
+        entries = leaderboard.get_user_lb_entries("score", 1, 1)
+        if len(entries) == 0:
+            return 0
+        else:
+            return entries[0]
+    except Exception as e:
+        print(e)
+        # Old leaderboard code
+        with open("highscore.json", "r") as openfile:
+            json_object = json.load(openfile)
+        return json_object["high_score"]
 
 # Initializes pygame
 pygame.init()
