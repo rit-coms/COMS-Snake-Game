@@ -298,6 +298,6 @@ async def main():
 
         pygame.display.update()
         # Framerate 60 fps
-        clock.tick(30)
+        clock.tick(60)
         
 asyncio.run(main())
