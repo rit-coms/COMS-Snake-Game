@@ -175,7 +175,7 @@ def get_high_score():
         if len(entries) == 0:
             return 0
         else:
-            return entries[0]
+            return int(entries[0].value_num)
     except Exception as e:
         print(e)
         # Old leaderboard code
