@@ -75,6 +75,8 @@ class MAIN:
         self.paused = True
         self.duck = DUCK(self.paused)
         self.bread = BREAD(self.duck.body)
+        self.leaderboard_updated = False
+        self.leaderboard = None
         
     """Updates the game, checks for methods that alter the display"""
     def update(self):
@@ -109,6 +111,7 @@ class MAIN:
 
     """Resets the game when it's over"""
     def game_over(self):
+        main_game.leaderboard_updated = False
         self.pause_game()
         self.duck.reset()
 
@@ -147,7 +150,7 @@ class MAIN:
 
     """Draws the high score"""
     def high_score_display(self):
-        high_score_value = get_high_score()
+        high_score_value = self.leaderboard[0]
         high_score = font.render("High Score: " + str(high_score_value), True, 'white')
         screen.blit(high_score, (520, 2))
 
@@ -216,6 +219,7 @@ SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 140)
 
 async def main():
+    global high_score_displayed
     running = True
     # Gameloop
     while running:
@@ -223,9 +227,12 @@ async def main():
         main_game.grass_pattern()
         main_game.draw_elements()
         main_game.display_score()
-        main_game.high_score_display()
 
         if main_game.paused:
+            if not main_game.leaderboard_updated:
+                main_game.leaderboard = get_high_score()
+                main_game.leaderboard_updated = True
+                
             main_game.game_paused_display()
 
         for event in pygame.event.get():
@@ -234,7 +241,7 @@ async def main():
                 running = False
                 sys.exit()
 
-            # detects if a controller is pluged in
+            # detects if a controller is plugged in
             if event.type == pygame.JOYDEVICEADDED:
                 print("Controller connected: " + str(event))
                 joy = pygame.joystick.Joystick(event.device_index)
